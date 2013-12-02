@@ -1,0 +1,69 @@
+apply plugin: 'base'
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'jetty'
+apply plugin: 'tomcat'
+apply plugin: 'cargo'
+ 
+ext.tomcatVersion = '7.0.29'
+ext.cargoVersion = '1.1.3'
+ 
+ 
+ 
+buildscript {
+    repositories {
+        add(new org.apache.ivy.plugins.resolver.URLResolver()) {
+            name = 'GitHub'
+            addArtifactPattern 'http://cloud.github.com/downloads/[organisation]/[module]/[module]-[revision].[ext]'
+        }
+    }
+ 
+    dependencies { 
+        classpath 'bmuschko:gradle-tomcat-plugin:0.9.3' 
+        classpath 'bmuschko:gradle-cargo-plugin:0.5.4'
+   }
+}
+ 
+ 
+ 
+repositories {
+ 
+    mavenCentral()
+ 
+    mavenRepo url: 'http://maven.springframework.org/release'
+    mavenRepo url: 'http://maven.springframework.org/snapshot'
+    mavenRepo url: 'http://maven.springframework.org/milestone'
+    mavenRepo url: 'https://repository.jboss.org/nexus/content/repositories/releases/'
+    mavenRepo url: 'http://download.java.net/maven/glassfish/org/glassfish/'
+ 
+}
+ 
+dependencies {
+ 
+ 
+   providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
+   compile 'org.springframework:spring-webmvc:3.2.2.RELEASE'
+   runtime "jstl:jstl:1.2"
+ 
+   tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}", "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}"
+   tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
+       exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+       cargo "org.codehaus.cargo:cargo-core-uberjar:${cargoVersion}",  "org.codehaus.cargo:cargo-ant:${cargoVersion}"
+   }
+ 
+ 
+}
+ 
+cargo {
+    containerId = 'tomcat7x'
+    port = 8080
+ 
+    local {
+        homeDir = file('C:/Tools/apache-tomcat-7.0.42')
+        output = file('C:/Tools/apache-tomcat-7.0.42/output.log')
+    }
+}
+ 
+war {   
+    version = '' 
+ }
